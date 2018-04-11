@@ -10,7 +10,10 @@ class CincoBot < SlackRubyBot::Bot
     resp = RestClient.get("#{API_BASE_URL}#{ENV['API_TOKEN']}")
     video_id = JSON.parse(resp.body)["items"].sample["contentDetails"]["videoId"]
 
-    client.say(text: "#{VIDEO_BASE_URL}#{video_id}", channel: data.channel)
+    # Slack doesn't like when it gets identical links twice.
+    cache_buster = rand(1 << 20)
+
+    client.say(text: "#{VIDEO_BASE_URL}#{video_id}&cache=#{cache_buster}", channel: data.channel, thread_ts: data.thread_ts)
   end
 end
 
